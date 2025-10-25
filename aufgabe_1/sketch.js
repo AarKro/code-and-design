@@ -72,25 +72,36 @@ function checkCanvasCollision(...circles) {
 }
 
 function checkCircleCollision(...circles) {
+  const veclocityChanges = [];
+
   circles.forEach((circle, i) => {
     const circleNextX = circle.x + circle.velocityX;
     const circleNextY = circle.y + circle.velocityY;
+
     circles.forEach((compareCircle, j) => {
       if (i !== j) {
         const compareCircleNextX = compareCircle.x + compareCircle.velocityX;
         const compareCircleNextY = compareCircle.y + compareCircle.velocityY;
-
+       
         if (dist(circleNextX, circleNextY, compareCircleNextX, compareCircleNextY) < (circle.diameter / 2 + compareCircle.diameter / 2)) {
           xDistance = abs(circle.x - compareCircle.x);
           yDistance = abs(circle.y - compareCircle.y);
           if (xDistance < yDistance) {
-            circle.velocityY *= -1;
+            veclocityChanges.push([circle, 'y']);
           } else {
-            circle.velocityX *= -1;
+            veclocityChanges.push([circle, 'x']);
           }
         }
       }
     });
+  });
+
+  veclocityChanges.forEach(([circle, axis]) => {
+    if (axis === 'x') {
+      circle.velocityX *= -1;
+    } else {
+      circle.velocityY *= -1;
+    }
   });
 }
 

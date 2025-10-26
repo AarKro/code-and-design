@@ -7,8 +7,7 @@ let sliderSize = 200;
 
 let valueSlider;
 
-let circleA;
-let circleB;
+const circles = [];
 
 function setup() {
   CANVAS_HEIGHT = windowHeight;
@@ -18,44 +17,46 @@ function setup() {
   valueSlider = createSlider(sliderMin, sliderMax, ((sliderMax + sliderMin) / 2));
   valueSlider.position(CANVAS_WIDTH / 2 - (sliderSize / 2), CANVAS_HEIGHT - 100);
   valueSlider.size(sliderSize);
-
-  circleA = {
-    pos: createVector(0, 0),
+  
+  circles.push({
+    pos: createVector(CANVAS_WIDTH / 4, CANVAS_HEIGHT / 2),
     velocity: createVector(5, 5),
-    diameter: 50
-  }
-
-  circleB = {
-    pos: createVector(0, 0),
+    diameter: 50,
+    mass: 1
+  });
+  circles.push({
+    pos: createVector(CANVAS_WIDTH / 4 * 3, CANVAS_HEIGHT / 2),
     velocity: createVector(5, 5),
-    diameter: 50
-  }
+    diameter: 50,
+    mass: 1
+  });
 
-  // circle start positions
-  circleA.pos.x = CANVAS_WIDTH / 4;
-  circleA.pos.y = CANVAS_HEIGHT / 2;
-  circleB.pos.x = CANVAS_WIDTH / 4 * 3;
-  circleB.pos.y = CANVAS_HEIGHT / 2;
+  angleMode(DEGREES);
 }
 
 function draw() {
   background(220);
   strokeWeight(10);
 
-  circleA.diameter = valueSlider.value();
-  circleB.diameter = (sliderMax + sliderMin) - valueSlider.value();
+  updateCircleDimensions(circles);
 
-  checkCanvasCollision(circleA, circleB);
-  checkCircleCollision(circleA, circleB);
+  checkCanvasCollision(circles);
+  checkCircleCollision(circles);
 
-  circleA.pos.add(circleA.velocity);
-  circleB.pos.add(circleB.velocity);
-
-  circle(circleA.pos.x, circleA.pos.y, circleA.diameter);
-  circle(circleB.pos.x, circleB.pos.y, circleB.diameter);
+  circles.forEach(c => {
+    c.pos.add(c.velocity);
+    circle(c.pos.x, c.pos.y, c.diameter);
+  });
 }
 
-function checkCanvasCollision(...circles) {
+function updateCircleDimensions(circles) {
+  circles[0].diameter = valueSlider.value();
+  circles[1].diameter = (sliderMax + sliderMin) - valueSlider.value();
+
+  circles.forEach(circle => circle.mass = circle.diameter * 0.1);
+}
+
+function checkCanvasCollision(circles) {
   circles.forEach(circle => {
     const nextPos = p5.Vector.add(circle.pos, circle.velocity);
 
@@ -68,9 +69,7 @@ function checkCanvasCollision(...circles) {
   });
 }
 
-function checkCircleCollision(...circles) {
-  const veclocityChanges = [];
-
+function checkCircleCollision(circles) {
   circles.forEach((circle, i) => {
     const circleNextPos = p5.Vector.add(circle.pos, circle.velocity);
 
@@ -79,25 +78,23 @@ function checkCircleCollision(...circles) {
         const compareCircleNextPos = p5.Vector.add(compareCircle.pos, compareCircle.velocity);
 
         if (dist(circleNextPos.x, circleNextPos.y, compareCircleNextPos.x, compareCircleNextPos.y) < (circle.diameter / 2 + compareCircle.diameter / 2)) {
-          xDistance = abs(circleNextPos.x - compareCircleNextPos.x);
-          yDistance = abs(circleNextPos.y - compareCircleNextPos.y);
+          const normal = p5.Vector.sub(circle.pos, compareCircle.pos).normalize();
+          const relativeVelocity = p5.Vector.sub(circle.velocity, compareCircle.velocity);
+          const velocityAlongNormal = p5.Vector.dot(relativeVelocity, normal);
 
-          if (xDistance < yDistance) {
-            veclocityChanges.push([circle, 'y']);
-          } else {
-            veclocityChanges.push([circle, 'x']);
+          if (velocityAlongNormal > 0) {
+            return;
           }
+
+          const impulse = (2 * velocityAlongNormal) / (circle.mass + compareCircle.mass);
+          const circleImpulse = normal.copy().mult(impulse * compareCircle.mass);
+          const compareCircleImpulse = normal.copy().mult(impulse * circle.mass);
+          
+          circle.velocity.sub(circleImpulse);
+          compareCircle.velocity.add(compareCircleImpulse);
         }
       }
     });
-  });
-
-  veclocityChanges.forEach(([circle, axis]) => {
-    if (axis === 'x') {
-      circle.velocity.x *= -1;
-    } else {
-      circle.velocity.y *= -1;
-    }
   });
 }
 

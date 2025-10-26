@@ -3,24 +3,12 @@ let CANVAS_HEIGHT;
 
 let sliderMin = 50;
 let sliderMax = 500;
+let sliderSize = 200;
 
 let valueSlider;
 
-const circleA = {
-  x: 0,
-  y: 0,
-  diameter: 50,
-  velocityX: 5,
-  velocityY: 5
-}
-
-const circleB = {
-  x: 0,
-  y: 0,
-  diameter: 50,
-  velocityX: 5,
-  velocityY: 5
-}
+let circleA;
+let circleB;
 
 function setup() {
   CANVAS_HEIGHT = windowHeight;
@@ -28,14 +16,26 @@ function setup() {
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 
   valueSlider = createSlider(sliderMin, sliderMax, ((sliderMax + sliderMin) / 2));
-  valueSlider.position(CANVAS_WIDTH / 2 - 100, CANVAS_HEIGHT - 100);
-  valueSlider.size(200);
+  valueSlider.position(CANVAS_WIDTH / 2 - (sliderSize / 2), CANVAS_HEIGHT - 100);
+  valueSlider.size(sliderSize);
+
+  circleA = {
+    pos: createVector(0, 0),
+    velocity: createVector(5, 5),
+    diameter: 50
+  }
+
+  circleB = {
+    pos: createVector(0, 0),
+    velocity: createVector(5, 5),
+    diameter: 50
+  }
 
   // circle start positions
-  circleA.x = CANVAS_WIDTH / 4;
-  circleA.y = CANVAS_HEIGHT / 2;
-  circleB.x = CANVAS_WIDTH / 4 * 3;
-  circleB.y = CANVAS_HEIGHT / 2;
+  circleA.pos.x = CANVAS_WIDTH / 4;
+  circleA.pos.y = CANVAS_HEIGHT / 2;
+  circleB.pos.x = CANVAS_WIDTH / 4 * 3;
+  circleB.pos.y = CANVAS_HEIGHT / 2;
 }
 
 function draw() {
@@ -48,25 +48,22 @@ function draw() {
   checkCanvasCollision(circleA, circleB);
   checkCircleCollision(circleA, circleB);
 
-  circleA.x += circleA.velocityX;
-  circleA.y += circleA.velocityY;
-  circleB.x += circleB.velocityX;
-  circleB.y += circleB.velocityY;
+  circleA.pos.add(circleA.velocity);
+  circleB.pos.add(circleB.velocity);
 
-  circle(circleA.x, circleA.y, circleA.diameter);
-  circle(circleB.x, circleB.y, circleB.diameter);
+  circle(circleA.pos.x, circleA.pos.y, circleA.diameter);
+  circle(circleB.pos.x, circleB.pos.y, circleB.diameter);
 }
 
 function checkCanvasCollision(...circles) {
   circles.forEach(circle => {
-    const nextX = circle.x + circle.velocityX;
-    if (nextX - circle.diameter / 2 <= 0 || nextX + circle.diameter / 2 >= CANVAS_WIDTH) {
-      circle.velocityX *= -1;
+    const nextPos = p5.Vector.add(circle.pos, circle.velocity);
+
+    if (nextPos.x - circle.diameter / 2 <= 0 || nextPos.x + circle.diameter / 2 >= CANVAS_WIDTH) {
+      circle.velocity.x *= -1;
     }
-  
-    const nextY = circle.y + circle.velocityY;
-    if (nextY - circle.diameter / 2 <= 0 || nextY + circle.diameter / 2 >= CANVAS_HEIGHT) {
-      circle.velocityY *= -1;
+    if (nextPos.y - circle.diameter / 2 <= 0 || nextPos.y + circle.diameter / 2 >= CANVAS_HEIGHT) {
+      circle.velocity.y *= -1;
     }
   });
 }
@@ -75,17 +72,16 @@ function checkCircleCollision(...circles) {
   const veclocityChanges = [];
 
   circles.forEach((circle, i) => {
-    const circleNextX = circle.x + circle.velocityX;
-    const circleNextY = circle.y + circle.velocityY;
+    const circleNextPos = p5.Vector.add(circle.pos, circle.velocity);
 
     circles.forEach((compareCircle, j) => {
       if (i !== j) {
-        const compareCircleNextX = compareCircle.x + compareCircle.velocityX;
-        const compareCircleNextY = compareCircle.y + compareCircle.velocityY;
-       
-        if (dist(circleNextX, circleNextY, compareCircleNextX, compareCircleNextY) < (circle.diameter / 2 + compareCircle.diameter / 2)) {
-          xDistance = abs(circle.x - compareCircle.x);
-          yDistance = abs(circle.y - compareCircle.y);
+        const compareCircleNextPos = p5.Vector.add(compareCircle.pos, compareCircle.velocity);
+
+        if (dist(circleNextPos.x, circleNextPos.y, compareCircleNextPos.x, compareCircleNextPos.y) < (circle.diameter / 2 + compareCircle.diameter / 2)) {
+          xDistance = abs(circleNextPos.x - compareCircleNextPos.x);
+          yDistance = abs(circleNextPos.y - compareCircleNextPos.y);
+
           if (xDistance < yDistance) {
             veclocityChanges.push([circle, 'y']);
           } else {
@@ -98,9 +94,9 @@ function checkCircleCollision(...circles) {
 
   veclocityChanges.forEach(([circle, axis]) => {
     if (axis === 'x') {
-      circle.velocityX *= -1;
+      circle.velocity.x *= -1;
     } else {
-      circle.velocityY *= -1;
+      circle.velocity.y *= -1;
     }
   });
 }

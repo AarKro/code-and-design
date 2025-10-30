@@ -20,7 +20,7 @@ function setup() {
   
   circles.push({
     pos: createVector(CANVAS_WIDTH / 4, CANVAS_HEIGHT / 2),
-    velocity: createVector(5, 5),
+    velocity: createVector(-10, 10),
     diameter: 50,
     mass: 1,
     fill: 255,
@@ -28,7 +28,7 @@ function setup() {
   });
   circles.push({
     pos: createVector(CANVAS_WIDTH / 4 * 3, CANVAS_HEIGHT / 2),
-    velocity: createVector(5, 5),
+    velocity: createVector(10, 10),
     diameter: 50,
     mass: 1,
     fill: 0,
@@ -36,11 +36,11 @@ function setup() {
   });
 
   angleMode(DEGREES);
+  background(127);
 }
 
 function draw() {
-  background(map(valueSlider.value(), sliderMin, sliderMax, 5, 250));
-  strokeWeight(0);
+  strokeWeight(1);
 
   updateCircleDimensions(circles);
 
@@ -49,6 +49,7 @@ function draw() {
 
   circles.forEach(c => {
     fill(c.fill);
+    stroke(c.strokeColor);
 
     c.pos.add(c.velocity);
     circle(c.pos.x, c.pos.y, c.diameter);

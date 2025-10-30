@@ -2,9 +2,8 @@
 
 This repository contains the code for the HF IAD module "Code & Design"
 
-- [excersise 1](https://github.com/AarKro/code-and-design/tree/main/aufgabe_1)
+Link to the [learn jounal](https://eduzh.sharepoint.com/teams/0011AAD-365-M-CLA-EBI0011-HFIAD24A/_layouts/15/Doc.aspx?sourcedoc={3747b925-ee2a-46b0-a81f-09a61b65b6b7}&action=edit&wd=target%28Aaron%20Kromer%7Cc69754dc-4525-44f7-9c87-2c459c774c01%2F%29&wdorigin=NavigationUrl)
 
-<p float="left">
-    <img alt="first variant" src="https://github.com/AarKro/code-and-design/blob/main/aufgabe_1/screenshots/v1.png?raw=true" width="350">
-    <img alt="second variant - harmony" src="https://github.com/AarKro/code-and-design/blob/main/aufgabe_1/screenshots/v2_harmony.png?raw=true" width="350">
-</p>
+## Excersises
+
+- [Aufgabe 1 - Slider: Beziehungen steuern](https://github.com/AarKro/code-and-design/tree/main/aufgabe_1)

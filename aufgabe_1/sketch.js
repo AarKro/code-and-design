@@ -1,9 +1,9 @@
 let CANVAS_WIDTH;
 let CANVAS_HEIGHT;
 
-let sliderMin = 50;
-let sliderMax = 500;
-let sliderSize = 200;
+const sliderMin = 50;
+const sliderMax = 500;
+const sliderSize = 200;
 
 let valueSlider;
 

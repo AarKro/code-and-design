@@ -1,58 +1,66 @@
 let CANVAS_WIDTH;
 let CANVAS_HEIGHT;
 
-let snake;
-
-let goalPos;
-const goalSize = 20;
+const snakes = [];
 
 function setup() {
   CANVAS_HEIGHT = windowHeight;
   CANVAS_WIDTH = windowWidth;
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
   
+  background(255);
+
   angleMode(DEGREES);
   colorMode(HSL);
 
-  goalPos = createVector(0, 0);
-  setNewGoalPos();
-  
-  snake = new Snake(200, 50);
-  snake.updateVelocity(goalPos);
+  // snakes.push(
+  //   new Snake(50, 50, 15, 20, 20, 340),
+  //   new Snake(50, 50, 15, 20, 20, 220),
+  //   new Snake(50, 50, 15, 20, 20, 145),
+  // );
 
-  background(255);
+  let amount = 30;
+  for (let i = 0; i < amount; i++) {
+    snakes.push(
+      new Snake(50, 50, 15, 20, 20, 360 / amount * i)
+    );
+  }
 }
 
 function draw() {
-
-  // drawGoal();
-
-  snake.update();
-  snake.display();
+  snakes.forEach(snake => {
+    snake.update();
+    snake.display();
+  });
 }
 
-// function drawGoal() {
-//   fill(100, 100, 50);
-//   circle(goalPos.x, goalPos.y, goalSize);
-// }
+function mouseDragged() {
+  focusSnakes();
+}
 
-function setNewGoalPos() {
-  let newGoalPos;
+function mouseClicked() {
+  focusSnakes();
+}
 
-  do {
-    newGoalPos = createVector(random(CANVAS_WIDTH), random(CANVAS_HEIGHT));
-  } while (newGoalPos.dist(goalPos) < 150);
-
-  goalPos.set(newGoalPos);
+function focusSnakes() {
+  snakes.forEach(snake => {
+    snake.setGoalPos(mouseX, mouseY);
+  });
 }
 
 class Snake {
-  constructor(x, y) {
+  constructor(x, y, initialSnakeLength, snakeSegmentLength, speed, color) {
     this.segments = [];
-    this.segmentLength = 20;
+    this.segmentLength = snakeSegmentLength;
     this.velocity = createVector(0, 0);
+    this.color = color;
+    this.speed = speed;
+    this.goalSize = 20;
+    this.goalPos = createVector(0, 0);
 
-    for (let i = 0; i < 10; i++) {
+    this.setNewGoalPos();
+
+    for (let i = 0; i < initialSnakeLength; i++) {
       this.segments.push(createVector(x - i * this.segmentLength, y));
     }
   }
@@ -93,35 +101,37 @@ class Snake {
     this.segments.push(newSegment);
   }
 
-  // checkSelfCollision() {
-  //   const head = this.getHead();
-  //   const nextPos = p5.Vector.add(head, this.velocity);
+  checkSelfCollision() {
+    const head = this.getHead();
+    const nextPos = p5.Vector.add(head, this.velocity);
 
-  //   // dont bother checking collision for first 4 segments right after the head
-  //   for (let i = 4; i < this.segments.length; i++) {
-  //     const segment = this.segments[i];
-  //     const prevSegment = this.segments[i - 1];
+    // dont bother checking collision for first 4 segments right after the head
+    for (let i = 4; i < this.segments.length; i++) {
+      const segment = this.segments[i];
+      const prevSegment = this.segments[i - 1];
 
-  //     const distanceToSegment = dist(nextPos.x, nextPos.y, segment.x, segment.y);
+      const distanceToSegment = dist(nextPos.x, nextPos.y, segment.x, segment.y);
 
-  //     if (distanceToSegment < this.segmentLength * 2) {
-  //       // rotate velocity in the reverse direction of the segments vector
-  //       const segmentDirection = p5.Vector.sub(segment, prevSegment).mult(-1).normalize();
-  //       const angleBetween = this.velocity.angleBetween(segmentDirection);
-  //       // rotate velocity by a 4th of the angle to smoothen the turn. We add 1 degree to avoid getting stuck in an infinite loop
-  //       this.velocity.rotate((angleBetween / 4 + 1) * -1);
-  //       break;
-  //     }
-  //   }
-  // }
+      if (distanceToSegment < this.segmentLength * 2) {
+        // rotate velocity in the reverse direction of the segments vector
+        const segmentDirection = p5.Vector.sub(segment, prevSegment).mult(-1).normalize();
+        const angleBetween = this.velocity.angleBetween(segmentDirection);
+        // rotate velocity by a 4th of the angle to smoothen the turn. We add 1 degree to avoid getting stuck in an infinite loop
+        this.velocity.rotate((angleBetween / 4 + 1) * -1);
+        break;
+      }
+    }
+  }
 
   checkGoalCollision() {
     const head = this.getHead();
-    const distanceToGoal = dist(head.x, head.y, goalPos.x, goalPos.y);
+    const distanceToGoal = dist(head.x, head.y, this.goalPos.x, this.goalPos.y);
 
-    if (distanceToGoal < this.segmentLength / 2 + goalSize / 2) {
-      setNewGoalPos();
+    if (distanceToGoal < this.segmentLength / 2 + this.goalSize / 2) {
+      this.setNewGoalPos();
       this.grow();
+    } else {
+      this.increaseGoalSize();
     }
   }
 
@@ -139,8 +149,8 @@ class Snake {
 
   updateVelocity() {
     const head = this.getHead();
-    let directionToGoal = p5.Vector.sub(goalPos, head);
-    directionToGoal.setMag(10);
+    let directionToGoal = p5.Vector.sub(this.goalPos, head);
+    directionToGoal.setMag(this.speed);
 
     const angleBetweenSnakeAndGoal = this.velocity.angleBetween(directionToGoal);
 
@@ -151,14 +161,35 @@ class Snake {
     this.velocity.set(directionToGoal);
   }
 
+  increaseGoalSize() {
+    // increase goal size over time to prevent the snake from getting stuck
+    this.goalSize += 0.8;
+  }
+
+  setNewGoalPos() {
+    this.goalSize = 20;
+    this.goalPos.set(createVector(random(50, CANVAS_WIDTH - 50), random(50, CANVAS_HEIGHT - 50)));
+  }
+
+  setGoalPos(x, y) {
+    this.goalPos.set(createVector(x, y));
+  }
+
   display() {
     noStroke();
-
+    let lightness = 40;
+    let factor = 2;
     // we subtract 2 to not render the last segment (tail) of the snake
     // it kinda messes up the pattern when spawning in
     for (let i = this.segments.length - 2; i >= 0; i--) {
       const segment = this.segments[i];
-      fill(10 * i, 100, 50);
+      lightness += factor;
+      
+      if (lightness > 80 || lightness < 40) {
+        factor *= -1;
+      }
+
+      fill(this.color, 100, lightness);
       circle(segment.x, segment.y, this.segmentLength);
     }
   }

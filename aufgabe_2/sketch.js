@@ -12,28 +12,29 @@ function setup() {
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
   
   angleMode(DEGREES);
+  colorMode(HSL);
 
   goalPos = createVector(0, 0);
   setNewGoalPos();
   
   snake = new Snake(200, 200);
   snake.updateVelocity(goalPos);
-  
+
   background(255);
 }
 
 function draw() {
 
-  drawGoal();
+  // drawGoal();
 
   snake.update();
   snake.display();
 }
 
-function drawGoal() {
-  fill(0, 255, 0);
-  circle(goalPos.x, goalPos.y, goalSize);
-}
+// function drawGoal() {
+//   fill(100, 100, 50);
+//   circle(goalPos.x, goalPos.y, goalSize);
+// }
 
 function setNewGoalPos() {
   let newGoalPos;
@@ -49,7 +50,7 @@ class Snake {
   constructor(x, y) {
     this.segments = [];
     this.segmentLength = 20;
-    this.velocity = createVector(5, 0);
+    this.velocity = createVector(0, 0);
 
     for (let i = 0; i < 10; i++) {
       this.segments.push(createVector(x, y + i * this.segmentLength));
@@ -139,12 +140,12 @@ class Snake {
   updateVelocity() {
     const head = this.getHead();
     let directionToGoal = p5.Vector.sub(goalPos, head);
-    directionToGoal.setMag(5);
+    directionToGoal.setMag(10);
 
     const angleBetweenSnakeAndGoal = this.velocity.angleBetween(directionToGoal);
 
-    if (abs(angleBetweenSnakeAndGoal) > 3) {
-      directionToGoal = this.velocity.copy().rotate(angleBetweenSnakeAndGoal < 0 ? -3 : 3);
+    if (abs(angleBetweenSnakeAndGoal) > 5) {
+      directionToGoal = this.velocity.copy().rotate(angleBetweenSnakeAndGoal < 0 ? -5 : 5);
     };
 
     this.velocity.set(directionToGoal);
@@ -154,12 +155,7 @@ class Snake {
     noStroke();
 
     this.segments.forEach((segment, i) => {
-      if (i === 0) {
-        fill(0);
-      } else {
-        fill(150);
-      }
-
+      fill(10 * i, 100, 50);
       circle(segment.x, segment.y, this.segmentLength);
     });
   }

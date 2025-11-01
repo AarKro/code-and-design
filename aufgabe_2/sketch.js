@@ -18,10 +18,11 @@ function setup() {
   
   snake = new Snake(200, 200);
   snake.updateVelocity(goalPos);
+  
+  background(255);
 }
 
 function draw() {
-  background(255);
 
   drawGoal();
 

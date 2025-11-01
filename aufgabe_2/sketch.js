@@ -13,39 +13,50 @@ function setup() {
   angleMode(DEGREES);
   colorMode(HSL);
 
-  // snakes.push(
-  //   new Snake(50, 50, 15, 20, 20, 340),
-  //   new Snake(50, 50, 15, 20, 20, 220),
-  //   new Snake(50, 50, 15, 20, 20, 145),
-  // );
+  snakes.push(
+    new Snake(50, 50, 30, 20, 20, 145),
+    new Snake(50, 50, 30, 20, 20, 220),
+    new Snake(50, 50, 30, 20, 20, 340),
+  );
 
-  let amount = 30;
-  for (let i = 0; i < amount; i++) {
-    snakes.push(
-      new Snake(50, 50, 15, 20, 20, 360 / amount * i)
-    );
-  }
+  // let amount = 30;
+  // for (let i = 0; i < amount; i++) {
+  //   snakes.push(
+  //     // x, y, initialSnakeLength, snakeSegmentLength, speed, color
+  //     // new Snake(50, 50, 15, random(15, 50), random(10, 20), random(0, 360))
+  //     new Snake(50, 50, 15, 20, 20, 360 / amount * i)
+  //   );
+  // }
+
+  textSize(64);
 }
 
 function draw() {
+  displayAverageSnakeLength();
+
+  if (mouseIsPressed) {
+    focusSnakes();
+  }
+
   snakes.forEach(snake => {
     snake.update();
     snake.display();
   });
 }
 
-function mouseDragged() {
-  focusSnakes();
-}
-
-function mouseClicked() {
-  focusSnakes();
-}
-
 function focusSnakes() {
   snakes.forEach(snake => {
     snake.setGoalPos(mouseX, mouseY);
   });
+}
+
+function displayAverageSnakeLength() {
+  const averageSnakeLength = snakes.reduce((sum, snake) => sum + snake.segments.length, 0) / snakes.length;
+  
+  fill(255);
+  rect(11, 13, 90, 70);
+  fill(0);
+  text(int(averageSnakeLength), 20, 70);
 }
 
 class Snake {
@@ -185,7 +196,7 @@ class Snake {
       const segment = this.segments[i];
       lightness += factor;
       
-      if (lightness > 80 || lightness < 40) {
+      if (lightness > 80 || lightness < 20) {
         factor *= -1;
       }
 

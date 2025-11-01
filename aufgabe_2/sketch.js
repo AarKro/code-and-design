@@ -16,25 +16,36 @@ function setup() {
   colorMode(HSL);
   rectMode(CENTER);
 
-  const startPos = createVector(20, CANVAS_HEIGHT / 2);
-
-  snakes.push(
-    new Snake(startPos, 30, 20, 20, 145),
-    new Snake(startPos, 30, 20, 20, 220),
-    new Snake(startPos, 30, 20, 20, 340),
-  );
-
-  // let amount = 30;
-  // for (let i = 0; i < amount; i++) {
-  //   snakes.push(
-  //     // x, y, initialSnakeLength, snakeSegmentLength, speed, color
-  //     // new Snake(50, 50, 15, random(15, 50), random(10, 20), random(0, 360))
-  //     new Snake(50, 50, 15, 20, 20, 360 / amount * i)
-  //   );
-  // }
-
   textSize(64);
   textAlign(CENTER, CENTER);
+
+  
+  // 3 regular sized snakes with different colors
+  // const startPos = createVector(20, CANVAS_HEIGHT / 2);
+  // snakes.push(
+  //   new Snake(startPos, 30, 20, 20, 145),
+  //   new Snake(startPos, 30, 20, 20, 220),
+  //   new Snake(startPos, 30, 20, 20, 340),
+  // );
+
+
+  // 300 thin snakes with different colors
+  let amount = 300;
+  for (let i = 0; i < amount; i++) {
+    const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
+    snakes.push(
+      new Snake(startPos, 30, 1, 20, 360 / amount * i)
+    );
+  }
+
+  // 30 completly random snakes
+  // let amount = 30;
+  // for (let i = 0; i < amount; i++) {
+  //   const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
+  //   snakes.push(
+  //     new Snake(startPos, random(10, 30), random(15, 50), random(10, 20), random(0, 360))
+  //   );
+  // }
 }
 
 function draw() {

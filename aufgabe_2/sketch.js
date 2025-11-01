@@ -6,6 +6,7 @@ const snakes = [];
 let clickedLocations = [];
 
 let followMouse = false;
+let growOnCollect = true;
 
 function setup() {
   CANVAS_HEIGHT = windowHeight;
@@ -29,6 +30,13 @@ function setup() {
   //   new Snake(startPos, 20, 20, 20, 340)
   // );
   
+  // 1 regular sized snake that does not grow on collecting goals
+  growOnCollect = false;
+  const startPos = createVector(20, CANVAS_HEIGHT / 2);
+  snakes.push(
+    new Snake(startPos, 83, 20, 20, 340)
+  );
+
   // 3 regular sized snakes with different colors
   // const startPos = createVector(20, CANVAS_HEIGHT / 2);
   // snakes.push(
@@ -49,14 +57,14 @@ function setup() {
 
 
   // 300 thin snakes with similar colors following the mouse
-  followMouse = true;
-  let amount = 300;
-  for (let i = 0; i < amount; i++) {
-    const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
-    snakes.push(
-      new Snake(startPos, 30, 1, 20, random(200, 360))
-    );
-  }
+  // followMouse = true;
+  // let amount = 300;
+  // for (let i = 0; i < amount; i++) {
+  //   const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
+  //   snakes.push(
+  //     new Snake(startPos, 30, 1, 20, random(200, 360))
+  //   );
+  // }
 
   // 30 completly random snakes
   // let amount = 30;
@@ -69,7 +77,7 @@ function setup() {
 }
 
 function draw() {
-  displayAverageSnakeLength();
+  // displayAverageSnakeLength();
 
   if (mouseIsPressed) {
     focusSnakes();
@@ -102,6 +110,7 @@ function clearScreen() {
 }
 
 function doubleClicked() {
+  // store the clicked location to clear the screen there over time
   clickedLocations.push({
     pos: createVector(mouseX, mouseY),
     progress: 0
@@ -148,6 +157,7 @@ class Snake {
 
     this.checkCanvasCollision();
 
+    // doesnt really work yet
     // this.checkSelfCollision();
 
     this.getHead().add(this.velocity);
@@ -211,7 +221,9 @@ class Snake {
 
     if (distanceToGoal < this.segmentLength / 2 + this.goalSize / 2) {
       this.setNewGoalPos();
-      this.grow();
+      if (growOnCollect) {
+        this.grow();
+      }
     } else {
       this.increaseGoalSize();
     }

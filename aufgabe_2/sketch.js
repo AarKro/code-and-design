@@ -3,6 +3,8 @@ let CANVAS_HEIGHT;
 
 const snakes = [];
 
+let clickedLocations = [];
+
 function setup() {
   CANVAS_HEIGHT = windowHeight;
   CANVAS_WIDTH = windowWidth;
@@ -12,11 +14,14 @@ function setup() {
 
   angleMode(DEGREES);
   colorMode(HSL);
+  rectMode(CENTER);
+
+  const startPos = createVector(20, CANVAS_HEIGHT / 2);
 
   snakes.push(
-    new Snake(50, 50, 30, 20, 20, 145),
-    new Snake(50, 50, 30, 20, 20, 220),
-    new Snake(50, 50, 30, 20, 20, 340),
+    new Snake(startPos, 30, 20, 20, 145),
+    new Snake(startPos, 30, 20, 20, 220),
+    new Snake(startPos, 30, 20, 20, 340),
   );
 
   // let amount = 30;
@@ -29,6 +34,7 @@ function setup() {
   // }
 
   textSize(64);
+  textAlign(CENTER, CENTER);
 }
 
 function draw() {
@@ -42,6 +48,28 @@ function draw() {
     snake.update();
     snake.display();
   });
+
+  drawClickedLocations();
+}
+
+function drawClickedLocations() {
+  clickedLocations.forEach(location => {
+    noFill();
+    strokeWeight(max(windowHeight, windowWidth) / 10);
+    stroke(255);
+
+    circle(location.pos.x, location.pos.y, max(windowHeight, windowWidth) / 10 * location.progress);
+    location.progress += 1;
+  });
+
+  clickedLocations = clickedLocations.filter(location => location.progress < 30);
+}
+
+function doubleClicked() {
+  clickedLocations.push({
+    pos: createVector(mouseX, mouseY),
+    progress: 0
+  });
 }
 
 function focusSnakes() {
@@ -53,14 +81,16 @@ function focusSnakes() {
 function displayAverageSnakeLength() {
   const averageSnakeLength = snakes.reduce((sum, snake) => sum + snake.segments.length, 0) / snakes.length;
   
+  noStroke();
   fill(255);
-  rect(11, 13, 90, 70);
+  rect(70, 47, 110, 70);
   fill(0);
-  text(int(averageSnakeLength), 20, 70);
+
+  text(int(averageSnakeLength), 70, 50);
 }
 
 class Snake {
-  constructor(x, y, initialSnakeLength, snakeSegmentLength, speed, color) {
+  constructor(position, initialSnakeLength, snakeSegmentLength, speed, color) {
     this.segments = [];
     this.segmentLength = snakeSegmentLength;
     this.velocity = createVector(0, 0);
@@ -72,7 +102,7 @@ class Snake {
     this.setNewGoalPos();
 
     for (let i = 0; i < initialSnakeLength; i++) {
-      this.segments.push(createVector(x - i * this.segmentLength, y));
+      this.segments.push(createVector(position.x - i * this.segmentLength, position.y));
     }
   }
 

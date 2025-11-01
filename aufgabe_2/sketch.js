@@ -60,10 +60,10 @@ function draw() {
     snake.display();
   });
 
-  drawClickedLocations();
+  clearScreen();
 }
 
-function drawClickedLocations() {
+function clearScreen() {
   clickedLocations.forEach(location => {
     noFill();
     strokeWeight(max(windowHeight, windowWidth) / 10);
@@ -199,6 +199,7 @@ class Snake {
     }
   }
 
+  // adjust the snakes velocity to point towards the goal position
   updateVelocity() {
     const head = this.getHead();
     let directionToGoal = p5.Vector.sub(this.goalPos, head);
@@ -206,6 +207,7 @@ class Snake {
 
     const angleBetweenSnakeAndGoal = this.velocity.angleBetween(directionToGoal);
 
+    // only allow small adjustments to the velocity to create smooth turning
     if (abs(angleBetweenSnakeAndGoal) > 5) {
       directionToGoal = this.velocity.copy().rotate(angleBetweenSnakeAndGoal < 0 ? -5 : 5);
     };
@@ -231,7 +233,7 @@ class Snake {
     noStroke();
     let lightness = 40;
     let factor = 2;
-    // we subtract 2 to not render the last segment (tail) of the snake
+    // subtracting 2 to not render the last segment (tail) of the snake
     // it kinda messes up the pattern when spawning in
     for (let i = this.segments.length - 2; i >= 0; i--) {
       const segment = this.segments[i];

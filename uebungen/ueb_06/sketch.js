@@ -37,17 +37,16 @@ function draw() {
   let blau = color(0, 200, 255);
   let pink = color(230, 0, 130);
 
-
   //Formen in wechselnder Farbe gelistet
-
-  for(let i = 0; i < 6; i++) {
+  let size = 6;
+  for(let i = 0; i < size; i++) {
     if (i % 2 == 0) {
       fill(blau);
     } else {
       fill(pink);
     }
-    
-    rect(width / 2 + abstandX * i, height / 2 + abstandY * i, 300 - i * 50, 300 - i * 50, radius);
+
+    rect(width / 2 + abstandX * i, height / 2 + abstandY * i, (size - i) * 50, (size - i) * 50, radius);
   }
 
   //Beschriftungen der Slider

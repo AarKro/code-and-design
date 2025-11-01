@@ -17,7 +17,7 @@ function setup() {
   goalPos = createVector(0, 0);
   setNewGoalPos();
   
-  snake = new Snake(200, 200);
+  snake = new Snake(200, 50);
   snake.updateVelocity(goalPos);
 
   background(255);
@@ -40,7 +40,7 @@ function setNewGoalPos() {
   let newGoalPos;
 
   do {
-    newGoalPos = createVector(random(100, CANVAS_WIDTH - 100), random(100, CANVAS_HEIGHT - 100));
+    newGoalPos = createVector(random(CANVAS_WIDTH), random(CANVAS_HEIGHT));
   } while (newGoalPos.dist(goalPos) < 150);
 
   goalPos.set(newGoalPos);
@@ -53,7 +53,7 @@ class Snake {
     this.velocity = createVector(0, 0);
 
     for (let i = 0; i < 10; i++) {
-      this.segments.push(createVector(x, y + i * this.segmentLength));
+      this.segments.push(createVector(x - i * this.segmentLength, y));
     }
   }
 
@@ -154,10 +154,13 @@ class Snake {
   display() {
     noStroke();
 
-    this.segments.forEach((segment, i) => {
+    // we subtract 2 to not render the last segment (tail) of the snake
+    // it kinda messes up the pattern when spawning in
+    for (let i = this.segments.length - 2; i >= 0; i--) {
+      const segment = this.segments[i];
       fill(10 * i, 100, 50);
       circle(segment.x, segment.y, this.segmentLength);
-    });
+    }
   }
 }
 

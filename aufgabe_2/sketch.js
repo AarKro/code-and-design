@@ -5,6 +5,8 @@ const snakes = [];
 
 let clickedLocations = [];
 
+let followMouse = false;
+
 function setup() {
   CANVAS_HEIGHT = windowHeight;
   CANVAS_WIDTH = windowWidth;
@@ -19,6 +21,13 @@ function setup() {
   textSize(64);
   textAlign(CENTER, CENTER);
 
+
+  // 1 big snake following the mouse
+  // followMouse = true;
+  // const startPos = createVector(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+  // snakes.push(
+  //   new Snake(startPos, 20, 20, 20, 340)
+  // );
   
   // 3 regular sized snakes with different colors
   // const startPos = createVector(20, CANVAS_HEIGHT / 2);
@@ -30,11 +39,22 @@ function setup() {
 
 
   // 300 thin snakes with different colors
+  // let amount = 300;
+  // for (let i = 0; i < amount; i++) {
+  //   const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
+  //   snakes.push(
+  //     new Snake(startPos, 30, 1, 20, 360 / amount * i)
+  //   );
+  // }
+
+
+  // 300 thin snakes with similar colors following the mouse
+  followMouse = true;
   let amount = 300;
   for (let i = 0; i < amount; i++) {
     const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
     snakes.push(
-      new Snake(startPos, 30, 1, 20, 360 / amount * i)
+      new Snake(startPos, 30, 1, 20, random(200, 360))
     );
   }
 
@@ -56,7 +76,12 @@ function draw() {
   }
 
   snakes.forEach(snake => {
-    snake.update();
+    if (followMouse) {
+      snake.update(mouseX, mouseY);
+    } else {
+      snake.update();
+    }
+
     snake.display();
   });
 
@@ -117,11 +142,12 @@ class Snake {
     }
   }
 
-  update() {
+  // optionally pass in x and y to override default goal position behavior
+  update(x, y) {
     this.updateVelocity();
 
     this.checkCanvasCollision();
-    
+
     // this.checkSelfCollision();
 
     this.getHead().add(this.velocity);
@@ -136,7 +162,11 @@ class Snake {
       currSegment.y = prevSegment.y - direction.y;
     }
 
-    this.checkGoalCollision();
+    if (x !== undefined && y !== undefined) {
+      this.goalPos.set(x, y);
+    } else {
+      this.checkGoalCollision();
+    }
   }
 
   getHead() {

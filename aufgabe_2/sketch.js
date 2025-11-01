@@ -4,7 +4,7 @@ let CANVAS_HEIGHT;
 let snake;
 
 let goalPos;
-const goalSize = 10;
+const goalSize = 20;
 
 function setup() {
   CANVAS_HEIGHT = windowHeight;
@@ -35,7 +35,13 @@ function drawGoal() {
 }
 
 function setNewGoalPos() {
-  goalPos.set(createVector(random(100, CANVAS_WIDTH - 100), random(100, CANVAS_HEIGHT - 100)));
+  let newGoalPos;
+
+  do {
+    newGoalPos = createVector(random(100, CANVAS_WIDTH - 100), random(100, CANVAS_HEIGHT - 100));
+  } while (newGoalPos.dist(goalPos) < 150);
+
+  goalPos.set(newGoalPos);
 }
 
 class Snake {
@@ -54,7 +60,7 @@ class Snake {
 
     this.checkCanvasCollision();
     
-    this.checkSelfCollision();
+    // this.checkSelfCollision();
 
     this.getHead().add(this.velocity);
 
@@ -85,27 +91,27 @@ class Snake {
     this.segments.push(newSegment);
   }
 
-  checkSelfCollision() {
-    const head = this.getHead();
-    const nextPos = p5.Vector.add(head, this.velocity);
+  // checkSelfCollision() {
+  //   const head = this.getHead();
+  //   const nextPos = p5.Vector.add(head, this.velocity);
 
-    // dont bother checking collision for first 4 segments right after the head
-    for (let i = 4; i < this.segments.length; i++) {
-      const segment = this.segments[i];
-      const prevSegment = this.segments[i - 1];
+  //   // dont bother checking collision for first 4 segments right after the head
+  //   for (let i = 4; i < this.segments.length; i++) {
+  //     const segment = this.segments[i];
+  //     const prevSegment = this.segments[i - 1];
 
-      const distanceToSegment = dist(nextPos.x, nextPos.y, segment.x, segment.y);
+  //     const distanceToSegment = dist(nextPos.x, nextPos.y, segment.x, segment.y);
 
-      if (distanceToSegment < this.segmentLength * 2) {
-        // rotate velocity in the reverse direction of the segments vector
-        const segmentDirection = p5.Vector.sub(segment, prevSegment).mult(-1).normalize();
-        const angleBetween = this.velocity.angleBetween(segmentDirection);
-        // rotate velocity by a 4th of the angle to smoothen the turn. We add 1 degree to avoid getting stuck in an infinite loop
-        this.velocity.rotate((angleBetween / 4 + 1) * -1);
-        break;
-      }
-    }
-  }
+  //     if (distanceToSegment < this.segmentLength * 2) {
+  //       // rotate velocity in the reverse direction of the segments vector
+  //       const segmentDirection = p5.Vector.sub(segment, prevSegment).mult(-1).normalize();
+  //       const angleBetween = this.velocity.angleBetween(segmentDirection);
+  //       // rotate velocity by a 4th of the angle to smoothen the turn. We add 1 degree to avoid getting stuck in an infinite loop
+  //       this.velocity.rotate((angleBetween / 4 + 1) * -1);
+  //       break;
+  //     }
+  //   }
+  // }
 
   checkGoalCollision() {
     const head = this.getHead();

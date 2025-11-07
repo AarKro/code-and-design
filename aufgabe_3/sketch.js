@@ -1,13 +1,15 @@
 let CANVAS_WIDTH;
 let CANVAS_HEIGHT;
 
-const RIGHT_EYE = 27;
 const LEFT_EYE = 32;
+const LEFT_EYE_BOUNDS = [67, 68, 69, 70];
 
 let capture;
+
+// clmtrackr tracker instance -- try MediaPipe FaceMesh -- or https://webgazer.cs.brown.edu/
 let tracker;
 
-const maskPositions = [];
+let trackingHistory;
 
 function setup() {
   CANVAS_HEIGHT = windowHeight;
@@ -22,29 +24,63 @@ function setup() {
   tracker.init();
   tracker.start(capture.elt);
   
+  trackingHistory = new TrackingHistory(50);
+  
   fill(255);
 }
 
 function draw() {
-  background(0);
+  // background(0);
 
   const currentPos = tracker.getCurrentPosition();
-  console.log(currentPos)
+
   if (!currentPos) {
     return;
   }
 
-  maskPositions.push(currentPos);
+  trackingHistory.add(currentPos);
 
-  if (maskPositions.length > 0) {
-    console.log(maskPositions)
+  if (trackingHistory.getAll().length > 0) {
     const leftEye = getPoint(LEFT_EYE);
-    circle(leftEye.x, leftEye.y, 100);
+
+    beginShape();
+
+    LEFT_EYE_BOUNDS
+      .map(getPoint)
+      .forEach((point) => vertex(point.x, point.y));
+
+    endShape(CLOSE);
+
+    circle(leftEye.x, leftEye.y, 5);
   }
 }
 
 function getPoint(maskIndex) {
-  return createVector(maskPositions[maskPositions.length - 1][maskIndex][0], maskPositions[maskPositions.length - 1][maskIndex][1]);
+  const mask = trackingHistory.getRecent();
+  return createVector(mask[maskIndex][0], mask[maskIndex][1]);
+}
+
+class TrackingHistory {
+  constructor(limit) {
+    this.history = [];
+    this.limit = limit;
+  }
+
+  add(position) {
+    this.history.push(position);
+    
+    if (this.history.length > this.limit) {
+      this.history.shift();
+    }
+  }
+
+  getAll() {
+    return this.history;
+  }
+
+  getRecent() {
+    return this.history[this.history.length - 1];
+  }
 }
 
 function windowResized() {

@@ -21,7 +21,8 @@ function setup() {
         return;
     }
 
-    trackingHistory.add(data);
+    const inBoundsPrediction = webgazer.util.bound(data);
+    trackingHistory.write(inBoundsPrediction);
   });
 }
 
@@ -40,7 +41,7 @@ class TrackingHistory {
     this.limit = limit;
   }
 
-  add(position) {
+  write(position) {
     this.history.push(position);
     
     if (this.history.length > this.limit) {

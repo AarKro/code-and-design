@@ -7,6 +7,7 @@ let clickedLocations = [];
 
 let followMouse = false;
 let growOnCollect = true;
+let leaveTrail = true;
 
 function setup() {
   CANVAS_HEIGHT = windowHeight;
@@ -22,6 +23,14 @@ function setup() {
   textSize(64);
   textAlign(CENTER, CENTER);
 
+  /**
+   * VARIANTS
+   * 
+   * - add snake objects to the snakes array with different parameters
+   * - enable mouse following by setting followMouse to true
+   * - disable growing on collecting goals by setting growOnCollect to false
+   * - disable leaving a trail by setting leaveTrail to false
+   */
 
   // 1 big snake following the mouse
   // followMouse = true;
@@ -31,30 +40,29 @@ function setup() {
   // );
   
   // 1 regular sized snake that does not grow on collecting goals
-  growOnCollect = false;
-  const startPos = createVector(20, CANVAS_HEIGHT / 2);
-  snakes.push(
-    new Snake(startPos, 83, 20, 20, 340)
-  );
-
-  // 3 regular sized snakes with different colors
+  // growOnCollect = false;
   // const startPos = createVector(20, CANVAS_HEIGHT / 2);
   // snakes.push(
-  //   new Snake(startPos, 30, 20, 20, 145),
-  //   new Snake(startPos, 30, 20, 20, 220),
-  //   new Snake(startPos, 30, 20, 20, 340),
+  //   new Snake(startPos, 83, 20, 20, 340)
   // );
 
+  // 3 regular sized snakes with different colors
+  // growOnCollect = false;
+  // const startPos = createVector(20, CANVAS_HEIGHT / 2);
+  // snakes.push(
+  //   new Snake(startPos, 83, 20, 20, 145),
+  //   new Snake(startPos, 83, 20, 20, 220),
+  //   new Snake(startPos, 83, 20, 20, 340),
+  // );
 
   // 300 thin snakes with different colors
-  // let amount = 300;
-  // for (let i = 0; i < amount; i++) {
-  //   const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
-  //   snakes.push(
-  //     new Snake(startPos, 30, 1, 20, 360 / amount * i)
-  //   );
-  // }
-
+  let amount = 300;
+  for (let i = 0; i < amount; i++) {
+    const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
+    snakes.push(
+      new Snake(startPos, 30, 1, 20, 360 / amount * i)
+    );
+  }
 
   // 300 thin snakes with similar colors following the mouse
   // followMouse = true;
@@ -63,6 +71,17 @@ function setup() {
   //   const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
   //   snakes.push(
   //     new Snake(startPos, 30, 1, 20, random(200, 360))
+  //   );
+  // }
+
+  // 300 thin snakes with different colors that do not grow on collecting goals and dont leave trails
+  // leaveTrail = false;
+  // growOnCollect = false;
+  // let amount = 300;
+  // for (let i = 0; i < amount; i++) {
+  //   const startPos = createVector(random(0, CANVAS_WIDTH), random(0, CANVAS_HEIGHT));
+  //   snakes.push(
+  //     new Snake(startPos, 50, 1, 20, 360 / amount * i)
   //   );
   // }
 
@@ -78,6 +97,10 @@ function setup() {
 
 function draw() {
   // displayAverageSnakeLength();
+
+  if (leaveTrail === false) {
+    background(255);
+  }
 
   if (mouseIsPressed) {
     focusSnakes();

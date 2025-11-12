@@ -10,6 +10,10 @@ const NUM_COLS = 4;
 let fieldWidth;
 let fieldHeight;
 
+let currentField;
+
+let transitionInstructions = {};
+
 function setup() {
   CANVAS_HEIGHT = windowHeight;
   CANVAS_WIDTH = windowWidth;
@@ -45,9 +49,39 @@ function draw() {
   }
    
   const gazePrediction = gazePredictionHistory.getRecent();
-  const fieldPosition = getFieldFromPredictionHistory(gazePrediction);
+  const nextFieldPosition = getFieldFromPredictionHistory(gazePrediction);
 
-  circle(fieldPosition.x, fieldPosition.y, 20);
+  if (currentField === undefined) {
+    currentField = nextFieldPosition;
+  }
+
+  if ((transitionInstructions.progress === transitionInstructions.duration) && (currentField && !currentField.equals(nextFieldPosition))) {
+    currentField = transitionInstructions.to || currentField;
+    transitionInstructions = createTransitionInstructions(currentField, nextFieldPosition);
+  }
+
+  if (transitionInstructions.progress < transitionInstructions.duration) {
+    transitionInstructions.progress++;
+    nextPos = createVector(
+      transitionInstructions.from.x + (transitionInstructions.to.x - transitionInstructions.from.x) * (transitionInstructions.progress / transitionInstructions.duration),
+      transitionInstructions.from.y + (transitionInstructions.to.y - transitionInstructions.from.y) * (transitionInstructions.progress / transitionInstructions.duration)
+    );
+
+    circle(nextPos.x, nextPos.y, 40);
+  } else {
+    currentField = transitionInstructions.to || currentField;
+
+    circle(currentField.x, currentField.y, 40);
+  }
+}
+
+function createTransitionInstructions(from, to) {
+  return {
+    from: from.copy(),
+    to: to.copy(),
+    duration: 10,
+    progress: 0,
+  }
 }
 
 function getFieldFromPredictionHistory(position) {

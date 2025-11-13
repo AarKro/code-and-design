@@ -7,3 +7,4 @@ Link to the [learn jounal](https://eduzh.sharepoint.com/teams/0011AAD-365-M-CLA-
 ## Excersises
 
 - [Aufgabe 1 - Slider: Beziehungen steuern](https://github.com/AarKro/code-and-design/tree/main/aufgabe_1)
+- [Aufgabe 2 - Animation und Interaktion](https://github.com/AarKro/code-and-design/tree/main/aufgabe_2)

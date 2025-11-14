@@ -23,6 +23,7 @@ let ratio;              // Skalierungsfaktor zwischen Video und Canvas
 let isModelReady = false; // Flag, ob das Modell geladen und Hände erkannt wurden
 let touchPoints = []; // Array für benutzerdefinierte Touch-Punkte
 let touchPointDiameter = 60; // Durchmesser der Touch-Punkte
+
 const HAND_COLLISION_POINT = "index_finger_tip"; // Index des Zeigefinger-Tipps im Keypoint-Array
 const PINCH_POINTS = ["thumb_tip", "index_finger_tip"]; // Keypoints für Pinch-Geste
 const keypointDiameter = 20; // Durchmesser der Keypoint-Kreise
@@ -40,6 +41,7 @@ function preload() {
  * Initialisiert Canvas und Webcam
  */
 function setup() {
+  colorMode(HSB);
   createCanvas(windowWidth, windowHeight);
   pixelDensity(1); // Performanceoptimierung
   
@@ -59,7 +61,7 @@ function setup() {
  * Hauptzeichnungs-Loop
  */
 function draw() {
-  background(0);
+  background(220);
 
   // Spiegle die Darstellung horizontal (für intuitivere Interaktion)
   push();
@@ -67,7 +69,7 @@ function draw() {
   scale(-1, 1);
 
   //Zeige das Video (optional)
-  image(video, 0, 0, video.width * ratio, video.height * ratio);
+  //image(video, 0, 0, video.width * ratio, video.height * ratio);
 
   // Zeichne nur, wenn das Modell bereit ist und Hände erkannt wurden
   if (isModelReady) {
@@ -145,23 +147,21 @@ function gotHands(results) {
  */
 function drawHandPoints() {
   // Durchlaufe alle erkannten Hände (normalerweise max. 2)
+  const connections = handpose.getConnections();
   for (let i = 0; i < hands.length; i++) {
     let hand = hands[i];
-    
-    // Durchlaufe alle 21 Keypoints einer Hand
-    for (let j = 0; j < hand.keypoints.length; j++) {
-      let keypoint = hand.keypoints[j];
-      
-      // Zeichne Keypoint als grüner Kreis
-      fill(0, 255, 0);
-      noStroke();
-      circle(keypoint.x * ratio, keypoint.y * ratio, keypointDiameter);
-    }
+    const connectionsToKeypoints = connections.map(c => [hand.keypoints[c[0]], hand.keypoints[c[1]]]);
+    connectionsToKeypoints.forEach(conn => {
+      stroke(0);
+      strokeWeight(10);
+      line(conn[0].x * ratio, conn[0].y * ratio, conn[1].x * ratio, conn[1].y * ratio);
+    });
   }
+
 }
 
 function drawTouchPoints() {
-  fill(255, 0, 0);
+  fill(getTouchPointColor(), 80, 80);
   noStroke();
   touchPoints.forEach(tp => {
     circle(tp.x, tp.y, touchPointDiameter);
@@ -204,7 +204,7 @@ function isGrabbingTouchPoint() {
 
 function isHoldingTouchPoint() {
   if (hands.length !== 1) return false;
-  
+
   return touchPoints.some(tp => {
     return hands.some(hand => {
       const averageDistanceToWrist = Object.keys(hand)
@@ -251,5 +251,10 @@ function detectResize() {
   if (firstFingerDistanceToTouchPoint > touchPointDiameter / 2 || secondFingerDistanceToTouchPoint > touchPointDiameter / 2) return;
 
   const distanceBetweenFingers = dist(fingerTips[0].x * ratio, fingerTips[0].y * ratio, fingerTips[1].x * ratio, fingerTips[1].y * ratio);
-  touchPointDiameter = distanceBetweenFingers + 20;
+  touchPointDiameter = distanceBetweenFingers + 30;
+}
+
+function getTouchPointColor() {
+  const touchPoint = touchPoints[0];
+  return map(touchPoint.x, 0, width, 0, 360);
 }

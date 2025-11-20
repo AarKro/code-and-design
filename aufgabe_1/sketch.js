@@ -83,6 +83,12 @@ function checkCircleCollision(circles) {
       if (i !== j) {
         const compareCircleNextPos = p5.Vector.add(compareCircle.pos, compareCircle.velocity);
 
+        /**
+         * if the distance between the center of the two circle is less than the sum of their radii
+         * we have a collision
+         * 
+         * calculate the resulting vector based on conservation of momentum (Newtons 3rd law)
+         */
         if (dist(circleNextPos.x, circleNextPos.y, compareCircleNextPos.x, compareCircleNextPos.y) < (circle.diameter / 2 + compareCircle.diameter / 2)) {
           const normal = p5.Vector.sub(circle.pos, compareCircle.pos).normalize();
           const relativeVelocity = p5.Vector.sub(circle.velocity, compareCircle.velocity);

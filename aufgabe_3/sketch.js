@@ -188,6 +188,12 @@ function isGrabbingTouchPoint() {
 
   return touchPoints.some(tp => {
     return hands.some(hand => {
+
+      /**
+       * 1. calculate distance between pinch points (thumb & index finger tip)
+       * 2. if distance is less than a threshold (e.g. 60 pixels), consider it a pinch
+       * 3. check if the pinch is close enough to the touch point
+       */
       const [p1, p2] = PINCH_POINTS.map(p => hand[p]);
 
       const pinchDistance = dist(p1.x * ratio, p1.y * ratio, p2.x * ratio, p2.y * ratio);

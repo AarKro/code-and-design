@@ -12,3 +12,4 @@ Link to the [learn jounal](https://eduzh.sharepoint.com/teams/0011AAD-365-M-CLA-
     - [live demo](https://aarkro.github.io/code-and-design/aufgabe_2/)
 - [Aufgabe 3 - Playful Interaction, Choreografien mit Code ](https://github.com/AarKro/code-and-design/tree/main/aufgabe_3)
     - [live demo](https://aarkro.github.io/code-and-design/aufgabe_3/)
+g
